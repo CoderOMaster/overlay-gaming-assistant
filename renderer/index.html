@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Title Bar -->
+        <div class="title-bar drag-handle">
+            <div class="title-content">
+                <span class="title">🎮 Game Assistant</span>
+                <div class="window-controls">
+                    <button class="control-btn minimize" id="minimizeBtn">─</button>
+                    <button class="control-btn close" id="closeBtn">✕</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="action-btn" id="screenshotBtn">
+                    <span class="icon">📸</span>
+                    <span class="label">Screenshot</span>
+                </button>
+                <button class="action-btn" id="settingsBtn">
+                    <span class="icon">⚙️</span>
+                    <span class="label">Settings</span>
+                </button>
+            </div>
+
+            <!-- Query Section -->
+            <div class="query-section">
+                <div class="input-group">
+                    <label for="queryInput">Ask about your game:</label>
+                    <input 
+                        type="text" 
+                        id="queryInput" 
+                        placeholder="How do I complete this mission?"
+                        autocomplete="off"
+                    >
+                    <button class="ask-btn" id="askBtn">Ask</button>
+                </div>
+            </div>
+
+            <!-- Response Section -->
+            <div class="response-section">
+                <div class="response-header">
+                    <span class="response-title">Response</span>
+                    <button class="clear-btn" id="clearBtn">Clear</button>
+                </div>
+                <div class="response-content" id="responseContent">
+                    <div class="placeholder">
+                        Ready to help! Ask me anything about your game.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <span class="status-text" id="statusText">Ready</span>
+                <span class="status-indicator" id="statusIndicator"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Settings</h3>
+                <button class="modal-close" id="closeModalBtn">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label for="opacitySlider">Overlay Opacity</label>
+                    <input type="range" id="opacitySlider" min="30" max="100" value="90">
+                    <span class="setting-value" id="opacityValue">90%</span>
+                </div>
+                <div class="setting-group">
+                    <label for="screenshotInterval">Screenshot Interval (seconds)</label>
+                    <input type="range" id="screenshotInterval" min="10" max="60" value="30">
+                    <span class="setting-value" id="intervalValue">30s</span>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="alwaysOnTop" checked>
+                        Always on top
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="saveSettingsBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
