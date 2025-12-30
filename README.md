@@ -36,6 +36,13 @@ A desktop overlay application that helps gamers with real-time assistance using 
 
 ## Usage
 
+### Example Images
+The `example/` folder contains sample images that demonstrate the types of game screenshots the application can analyze:
+- `image.png` - Example game screenshot for testing AI analysis
+- `image_example2.png` - Additional example screenshot
+
+You can use these images to test the application's AI analysis capabilities by placing them in the screenshots folder or using them as reference for the types of game states the app can help with.
+
 ### Option 1: Using the start script (Recommended)
 ```bash
 ./scripts/start_app.sh
