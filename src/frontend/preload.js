@@ -4,7 +4,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Window controls
   minimizeWindow: () => ipcRenderer.send('minimize-window'),
   closeWindow: () => ipcRenderer.send('close-window'),
-  startDrag: () => ipcRenderer.send('start-drag'),
   
   // Query processing
   processQuery: (query) => ipcRenderer.invoke('process-query', query),

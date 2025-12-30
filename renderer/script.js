@@ -23,11 +23,21 @@ class GameAssistant {
     setupEventListeners() {
         // Window controls
         document.getElementById('minimizeBtn').addEventListener('click', () => {
-            window.electronAPI.minimizeWindow();
+            if (window.electronAPI && window.electronAPI.minimizeWindow) {
+                window.electronAPI.minimizeWindow();
+            } else {
+                // Fallback: hide the window manually
+                document.querySelector('.app-container').style.display = 'none';
+            }
         });
 
         document.getElementById('closeBtn').addEventListener('click', () => {
-            window.electronAPI.closeWindow();
+            if (window.electronAPI && window.electronAPI.closeWindow) {
+                window.electronAPI.closeWindow();
+            } else {
+                // Fallback: hide the window
+                document.querySelector('.app-container').style.display = 'none';
+            }
         });
 
         // Action buttons

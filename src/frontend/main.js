@@ -31,26 +31,27 @@ function createWindow() {
     },
     transparent: true,
     frame: false,
-    alwaysOnTop: config.alwaysOnTop,
+    alwaysOnTop: true, // Force always on top
     skipTaskbar: true,
     resizable: true,
-    opacity: config.overlayOpacity,
+    opacity: 0.95, // Slightly more visible
     vibrancy: 'dark',
-    visualEffectState: 'active'
+    visualEffectState: 'active',
+    hasShadow: false, // Remove shadow for cleaner overlay
+    thickFrame: false, // Remove frame for transparency
+    titleBarStyle: 'hidden' // Hide title bar for full transparency
   });
+
+  // Make the overlay float above most apps (especially on macOS).
+  // Note: Some games using exclusive fullscreen can still block overlays.
+  mainWindow.setAlwaysOnTop(true, 'screen-saver');
+  mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  mainWindow.setFullScreenable(false);
 
   mainWindow.loadFile('renderer/index.html');
 
-  // Make window draggable
-  mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.executeJavaScript(`
-      document.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.drag-handle')) {
-          window.electronAPI.startDrag();
-        }
-      });
-    `);
-  });
+  // Dragging is implemented via CSS (-webkit-app-region: drag)
+  // to avoid custom IPC and platform quirks.
 
   if (isDev) {
     mainWindow.webContents.openDevTools();
@@ -70,7 +71,15 @@ function createWindow() {
 }
 
 function createTray() {
-  tray = new Tray(path.join(__dirname, 'renderer/icon.png'));
+  // __dirname is src/frontend. The icon lives at repo-root/renderer/icon.png
+  const iconPath = path.resolve(__dirname, '..', '..', 'renderer', 'icon.png');
+  try {
+    tray = new Tray(iconPath);
+  } catch (e) {
+    console.error(`Failed to create tray. Could not load icon at: ${iconPath}`);
+    console.error(e);
+    return;
+  }
   
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -158,7 +167,7 @@ function startPythonBackend() {
 // IPC Handlers
 ipcMain.handle('process-query', async (event, query) => {
   try {
-    const response = await axios.post('http://localhost:8080/query', { query });
+    const response = await axios.post('http://127.0.0.1:8080/query', { query });
     return response.data;
   } catch (error) {
     console.error('Query error:', error);
@@ -168,11 +177,41 @@ ipcMain.handle('process-query', async (event, query) => {
 
 ipcMain.handle('take-screenshot', async () => {
   try {
-    const response = await axios.post('http://localhost:8080/screenshot');
+    // Temporarily hide overlay to get clean screenshot
+    if (mainWindow && mainWindow.isVisible()) {
+      mainWindow.hide();
+      // Wait a moment for window to hide
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    const response = await axios.post('http://127.0.0.1:8080/screenshot');
+    
+    // Show overlay again after screenshot
+    if (mainWindow) {
+      mainWindow.show();
+      mainWindow.focus();
+    }
+    
     return response.data;
   } catch (error) {
     console.error('Screenshot error:', error);
+    // Ensure overlay is visible even if screenshot fails
+    if (mainWindow) {
+      mainWindow.show();
+    }
     return { error: 'Failed to take screenshot' };
+  }
+});
+
+ipcMain.handle('minimize-window', () => {
+  if (mainWindow) {
+    mainWindow.minimize();
+  }
+});
+
+ipcMain.handle('close-window', () => {
+  if (mainWindow) {
+    app.quit();
   }
 });
 
@@ -180,7 +219,11 @@ ipcMain.handle('update-settings', async (event, settings) => {
   Object.assign(config, settings);
   if (mainWindow) {
     mainWindow.setOpacity(config.overlayOpacity);
-    mainWindow.setAlwaysOnTop(config.alwaysOnTop);
+    if (config.alwaysOnTop) {
+      mainWindow.setAlwaysOnTop(true, 'screen-saver');
+    } else {
+      mainWindow.setAlwaysOnTop(false);
+    }
   }
   return { success: true };
 });
@@ -194,8 +237,10 @@ app.whenReady().then(() => {
   createTray();
   setupGlobalShortcuts();
   startPythonBackend();
+});
 
-  app.on('activate', () => {
+app.on('activate', () => {
+  app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
     }
@@ -222,9 +267,14 @@ if (!gotTheLock) {
   app.quit();
 } else {
   app.on('second-instance', () => {
-    if (mainWindow) {
+    app.whenReady().then(() => {
+      if (!mainWindow) {
+        createWindow();
+        return;
+      }
       if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.show();
       mainWindow.focus();
-    }
+    });
   });
 }
