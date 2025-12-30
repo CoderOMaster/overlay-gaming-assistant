@@ -2,7 +2,7 @@
   "name": "game-assistant",
   "version": "1.0.0",
   "description": "Desktop overlay app for gaming assistance with AI and web search",
-  "main": "main.js",
+  "main": "src/frontend/main.js",
   "scripts": {
     "start": "electron .",
     "dev": "electron . --dev",
@@ -28,8 +28,8 @@
       "output": "dist"
     },
     "files": [
-      "main.js",
-      "preload.js",
+      "src/frontend/main.js",
+      "src/frontend/preload.js",
       "renderer/**/*",
       "node_modules/**/*"
     ],

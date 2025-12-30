@@ -15,12 +15,17 @@ A desktop overlay application that helps gamers with real-time assistance using 
 ## Installation
 
 1. **Clone or download the project**
-2. **Install dependencies**:
+2. **Install Python dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Set up OpenAI API key** (optional but recommended):
+3. **Install Node.js dependencies**:
+   ```bash
+   npm install
+   ```
+
+4. **Set up OpenAI API key** (optional but recommended):
    ```bash
    # For Linux/macOS
    export OPENAI_API_KEY='your-openai-api-key-here'
@@ -31,16 +36,27 @@ A desktop overlay application that helps gamers with real-time assistance using 
 
 ## Usage
 
-1. **Run the application**:
+### Option 1: Using the start script (Recommended)
+```bash
+./scripts/start_app.sh
+```
+
+### Option 2: Manual startup
+1. **Start the Python backend**:
    ```bash
-   python game_assistant.py
+   python src/backend/backend_server.py
    ```
 
-2. **Use hotkeys**:
+2. **Start the Electron frontend** (in a new terminal):
+   ```bash
+   npm start
+   ```
+
+3. **Use hotkeys**:
    - `Ctrl+Shift+G` - Toggle overlay visibility
    - `Ctrl+Shift+S` - Take screenshot immediately
 
-3. **Ask questions** through the overlay:
+4. **Ask questions** through the overlay:
    - "How much longer do I need to finish this mission?"
    - "How do I get this charm and unlock the level?"
    - "What's the best strategy for this boss?"
@@ -55,7 +71,7 @@ A desktop overlay application that helps gamers with real-time assistance using 
 
 ## Configuration
 
-You can modify settings in `config.py`:
+You can modify settings in `src/backend/config.py`:
 
 - `SCREENSHOT_INTERVAL`: Time between automatic screenshots (seconds)
 - `OVERLAY_OPACITY`: Transparency of the overlay window (0.3-1.0)
@@ -65,19 +81,35 @@ You can modify settings in `config.py`:
 ## Project Structure
 
 ```
-├── game_assistant.py      # Main application entry point
-├── config.py              # Configuration settings
-├── screenshot_manager.py  # Handles screenshot capture
-├── llm_processor.py       # AI/LLM integration
-├── web_searcher.py        # Web search functionality
-├── overlay_ui.py          # User interface and system tray
-├── requirements.txt       # Python dependencies
-└── README.md             # This file
+├── src/
+│   ├── backend/              # Python backend services
+│   │   ├── backend_server.py # Main backend server
+│   │   ├── config.py         # Configuration settings
+│   │   ├── llm_processor.py  # AI/LLM integration
+│   │   ├── screenshot_manager.py # Screenshot capture
+│   │   └── web_searcher.py   # Web search functionality
+│   └── frontend/             # Electron frontend
+│       ├── main.js          # Main Electron process
+│       └── preload.js       # Preload script
+├── renderer/                 # Frontend UI files
+│   ├── index.html           # Main UI
+│   ├── script.js            # Frontend logic
+│   └── styles.css           # Styling
+├── scripts/                  # Utility scripts
+│   └── start_app.sh         # Application launcher
+├── docs/                     # Documentation
+│   └── ELECTRON_SETUP.md    # Electron setup guide
+├── cache/                    # Temporary cache
+├── screenshots/              # Captured screenshots
+├── package.json             # Node.js dependencies
+├── requirements.txt         # Python dependencies
+└── README.md                # This file
 ```
 
 ## Requirements
 
 - Python 3.7+
+- Node.js 14+
 - OpenAI API key (for AI features)
 - Internet connection (for web search and AI API)
 

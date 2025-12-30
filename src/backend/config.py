@@ -8,7 +8,7 @@ class Config:
     OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY")
     
     # Screenshot settings
-    SCREENSHOT_INTERVAL: int = 30  # seconds
+    SCREENSHOT_INTERVAL: int = 300  # seconds (5 minutes)
     SCREENSHOT_QUALITY: int = 85
     MAX_SCREENSHOTS: int = 10
     
@@ -19,8 +19,8 @@ class Config:
     
     # LLM settings
     MODEL_NAME: str = "gpt-4o-mini"
-    MAX_TOKENS: int = 500
-    TEMPERATURE: float = 0.7
+    MAX_TOKENS: int = 5000
+    TEMPERATURE: float = 0.1
     
     # Web search settings
     SEARCH_TIMEOUT: int = 10

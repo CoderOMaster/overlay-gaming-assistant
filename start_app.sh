@@ -13,7 +13,7 @@ fi
 
 # Start Python backend in background
 echo "🚀 Starting Python backend..."
-python3 backend_server.py &
+python3 src/backend/backend_server.py &
 BACKEND_PID=$!
 
 # Wait a moment for backend to start
@@ -30,7 +30,13 @@ echo "✅ Backend started successfully"
 
 # Start Electron app
 echo "🖥️  Starting Electron app..."
-npm start
+cd src/frontend
+if ! npm start; then
+    echo "❌ Electron app failed to start"
+    kill $BACKEND_PID 2>/dev/null
+    exit 1
+fi
+cd ../..
 
 # Cleanup on exit
 echo "🛑 Shutting down..."
