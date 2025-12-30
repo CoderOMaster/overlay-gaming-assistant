@@ -45,7 +45,7 @@ You can use these images to test the application's AI analysis capabilities by p
 
 ### Option 1: Using the start script (Recommended)
 ```bash
-./scripts/start_app.sh
+./start_app.sh
 ```
 
 ### Option 2: Manual startup
@@ -118,13 +118,6 @@ You can modify settings in `src/backend/config.py`:
 - Python 3.7+
 - Node.js 14+
 - OpenAI API key (for AI features)
-- Internet connection (for web search and AI API)
-
-## Platform Support
-
-- ✅ Windows
-- ✅ macOS  
-- ✅ Linux
 
 ## Troubleshooting
 
@@ -140,11 +133,6 @@ You can modify settings in `src/backend/config.py`:
 - Verify your OpenAI API key is set correctly
 - Check your internet connection
 
-## Privacy
-
-- Screenshots are stored locally and deleted after 1 hour
-- No personal data is sent to third parties except for AI API calls
-- Web searches are performed through privacy-friendly services
 
 ## License
 
