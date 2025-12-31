@@ -33,19 +33,27 @@
                 </button>
             </div>
 
-            <!-- Query Section -->
-            <div class="query-section">
-                <div class="input-group">
-                    <label for="queryInput">Ask about your game:</label>
-                    <input 
-                        type="text" 
-                        id="queryInput" 
-                        placeholder="How do I complete this mission?"
-                        autocomplete="off"
-                    >
-                    <button class="ask-btn" id="askBtn">Ask</button>
-                </div>
-            </div>
+          <!-- Query Section -->
+<div class="query-section">
+    <div class="input-group">
+        <label for="queryInput">Ask about your game:</label>
+        <div class="input-wrapper">
+            <input 
+                type="text" 
+                id="queryInput" 
+                placeholder="How do I complete this mission?"
+                autocomplete="off"
+            >
+            <button class="mic-btn" id="micBtn" title="Click to speak">
+                <span class="mic-icon">🎤</span>
+            </button>
+            <button class="ask-btn" id="askBtn">Ask</button>
+        </div>
+        <span class="recording-status" id="recordingStatus" style="display: none;">
+            🔴 Recording...
+        </span>
+    </div>
+</div>
 
             <!-- Response Section -->
             <div class="response-section">
