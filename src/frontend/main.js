@@ -144,11 +144,46 @@ function setupGlobalShortcuts() {
 }
 
 function startPythonBackend() {
-  const { spawn } = require('child_process');
-  
-  pythonProcess = spawn('python3', ['backend_server.py'], {
-    cwd: __dirname,
-    stdio: ['pipe', 'pipe', 'pipe']
+  const { spawn, spawnSync } = require('child_process');
+  const backendDir = path.resolve(__dirname, '..', 'backend');
+  const scriptPath = path.join(backendDir, 'backend_server.py');
+
+  // Try PYTHON_PATH env override first, then common Python commands
+  const candidates = [
+    ...(process.env.PYTHON_PATH ? [{ cmd: process.env.PYTHON_PATH, args: ['--version'] }] : []),
+    { cmd: 'python', args: ['--version'] },
+    { cmd: 'python3', args: ['--version'] },
+    // Windows Python Launcher
+    { cmd: 'py', args: ['-3', '--version'] },
+  ];
+
+  let selectedCmd = null;
+  let selectedPrefixArgs = [];
+  for (const c of candidates) {
+    try {
+      const res = spawnSync(c.cmd, c.args, { stdio: 'ignore' });
+      if (res && res.status === 0) {
+        selectedCmd = c.cmd;
+        // For 'py -3', we need to preserve the '-3' when launching the script
+        selectedPrefixArgs = c.cmd === 'py' ? ['-3'] : [];
+        break;
+      }
+    } catch (e) {
+      // ignore and try next
+    }
+  }
+
+  if (!selectedCmd) {
+    console.error('No suitable Python interpreter found on PATH. Please install Python 3 and ensure it is on your PATH.');
+    return;
+  }
+
+  const spawnArgs = [...selectedPrefixArgs, scriptPath];
+
+  pythonProcess = spawn(selectedCmd, spawnArgs, {
+    cwd: backendDir,
+    stdio: ['pipe', 'pipe', 'pipe'],
+    env: { ...process.env, PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' }
   });
 
   pythonProcess.stdout.on('data', (data) => {
@@ -161,6 +196,10 @@ function startPythonBackend() {
 
   pythonProcess.on('close', (code) => {
     console.log(`Python process exited with code ${code}`);
+  });
+
+  pythonProcess.on('error', (err) => {
+    console.error('Failed to start Python process:', err);
   });
 }
 
@@ -203,6 +242,7 @@ ipcMain.handle('take-screenshot', async () => {
   }
 });
 
+// Support both invoke and send from renderer
 ipcMain.handle('minimize-window', () => {
   if (mainWindow) {
     mainWindow.minimize();
@@ -210,6 +250,18 @@ ipcMain.handle('minimize-window', () => {
 });
 
 ipcMain.handle('close-window', () => {
+  if (mainWindow) {
+    app.quit();
+  }
+});
+
+ipcMain.on('minimize-window', () => {
+  if (mainWindow) {
+    mainWindow.minimize();
+  }
+});
+
+ipcMain.on('close-window', () => {
   if (mainWindow) {
     app.quit();
   }

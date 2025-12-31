@@ -6,6 +6,15 @@ import os
 import sys
 from typing import Optional
 
+try:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+os.environ.setdefault("PYTHONIOENCODING", "utf-8")
+
 # Add current directory to path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -13,6 +22,7 @@ from config import config
 from screenshot_manager import ScreenshotManager
 from llm_processor import LLMProcessor
 from web_searcher import WebSearcher
+from transcribe_audio import transcribe_audio_endpoint
 
 class BackendServer:
     def __init__(self):
@@ -118,6 +128,18 @@ class BackendServer:
                 print(f"❌ Screenshot error: {e}")
                 return jsonify({'error': str(e)}), 500
         
+        @self.app.route('/transcribe', methods=['POST'])
+        def handle_transcribe():
+            """Transcribe audio to text using OpenAI Whisper"""
+            try:
+                print("🎤 Received transcription request")
+                result = transcribe_audio_endpoint()
+                print(f"✅ Transcription complete")
+                return result
+            except Exception as e:
+                print(f"❌ Transcription error: {e}")
+                return jsonify({'error': str(e)}), 500
+        
         @self.app.route('/status', methods=['GET'])
         def get_status():
             return jsonify({
@@ -178,6 +200,11 @@ class BackendServer:
     def run(self):
         """Run the Flask server."""
         print("🚀 Starting backend server on http://localhost:8080")
+        print("=" * 50)
+        print("📡 Voice transcription endpoint available at /transcribe")
+        print("🎮 Query endpoint available at /query")
+        print("📸 Screenshot endpoint available at /screenshot")
+        print("=" * 50)
         self.app.run(host='127.0.0.1', port=8080, debug=False, use_reloader=False)
 
 def main():
@@ -186,6 +213,14 @@ def main():
     print("=" * 50)
     print("Backend will be available at http://localhost:8080")
     print("Frontend will be available at http://localhost:5173")
+    
+    # Check OpenAI API key
+    if os.environ.get('OPENAI_API_KEY'):
+        print("✅ OpenAI API Key: Set")
+    else:
+        print("⚠️  OpenAI API Key: Not Set (voice transcription will not work)")
+        print("   Set it with: export OPENAI_API_KEY='your-key-here'")
+    
     print("=" * 50)
     
     server = BackendServer()

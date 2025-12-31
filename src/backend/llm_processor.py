@@ -4,7 +4,8 @@ import requests
 from typing import Optional, Dict, Any
 from PIL import Image
 import io
-
+from dotenv import load_dotenv
+load_dotenv()
 from config import config
 
 class LLMProcessor:
